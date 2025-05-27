@@ -1,7 +1,6 @@
-import dbConnect from "../../lib/dbConnect";
 import Token from "../../models/token";
 import User from "../../models/User";
-
+import dbConnect from "../../util/dbConnect";
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).end();
 
