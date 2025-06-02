@@ -1,6 +1,5 @@
 # 🛍️ ShopZone – Modern E-commerce Platform
 
-![ShopZone Banner](https://via.placeholder.com/1200x400)
 
 Welcome to **ShopZone**, a full-stack modern e-commerce platform built to deliver a fast, secure, and interactive online shopping experience. It features a fully responsive frontend, admin dashboard, email verification, and intelligent chatbot support to streamline shopping and support.
 
@@ -85,7 +84,6 @@ Welcome to **ShopZone**, a full-stack modern e-commerce platform built to delive
 
 - Node.js v16+
 - MongoDB Atlas Cluster
-- Stripe/PayPal Developer Account
 - Gmail SMTP for email OTPs
 
 ---
@@ -99,34 +97,39 @@ npm install
 🔧 Environment Setup
 Create a .env.local file with the following:
 
-env
-Copy
-Edit
-MONGODB_URI=your_mongodb_connection_string
-NEXTAUTH_SECRET=your_auth_secret
-NEXTAUTH_URL=http://localhost:3000
-EMAIL_SERVER_USER=your_email@gmail.com
-EMAIL_SERVER_PASS=your_app_password
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_key
-CLOUDINARY_API_SECRET=your_secret
-STRIPE_SECRET_KEY=your_stripe_key
-📲 Run the Dev Server
-bash
-Copy
-Edit
+```
+
+  ```bash
+  env
+  
+  MONGODB_URI=your_mongodb_connection_string
+  NEXTAUTH_SECRET=your_auth_secret
+  NEXTAUTH_URL=http://localhost:3000
+  EMAIL_SERVER_USER=your_email@gmail.com
+  EMAIL_SERVER_PASS=your_app_password
+  CLOUDINARY_CLOUD_NAME=your_cloud_name
+  CLOUDINARY_API_KEY=your_key
+  CLOUDINARY_API_SECRET=your_secret
+  STRIPE_SECRET_KEY=your_stripe_key
+  📲 Run the Dev Server
+```
+```bash
 npm run dev
+
+```
+
 Visit http://localhost:3000
 
 🤝 Contributing
+
 We welcome pull requests, discussions, and suggestions. Please fork the repo, submit your changes, and open a PR.
 
 📫 Contact
-💻 Developer: Awais Shabbir
 
-📧 Email: awaisshabbir.dev@gmail.com
+💻 Developer: Awais Shabbir & m. Owais Awan
 
-💬 Telegram: @awaisshabbir
+📧 Email: awaiskamboh0810@gmail.com
 
 ⭐ Like This Project?
+
 Don’t forget to star ⭐ the repo if you found it helpful!
