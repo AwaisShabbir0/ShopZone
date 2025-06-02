@@ -1,5 +1,4 @@
-// At the top
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import OutsideClickHandler from "react-outside-click-handler";
 import Title from "../ui/Title";
 import { GiCancel } from "react-icons/gi";
@@ -14,6 +13,7 @@ const AddProduct = ({ setIsProductModal }) => {
   const [file, setFile] = useState(null);
   const [imageSrc, setImageSrc] = useState(null);
   const [categories, setCategories] = useState([]);
+  const fileInputRef = useRef();
 
   const getCategories = async () => {
     try {
@@ -29,12 +29,14 @@ const AddProduct = ({ setIsProductModal }) => {
   }, []);
 
   const handleOnchange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
     const reader = new FileReader();
     reader.onload = (event) => {
       setImageSrc(event.target.result);
-      setFile(e.target.files[0]);
+      setFile(selectedFile);
     };
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(selectedFile);
   };
 
   const formik = useFormik({
@@ -43,11 +45,12 @@ const AddProduct = ({ setIsProductModal }) => {
       desc: "",
       category: "",
       smallPrice: "",
-      mediumPrice: "",
-      largePrice: "",
     },
     validationSchema: productSchema,
     onSubmit: async (values) => {
+      console.log("📤 Form submitted:", values);
+      console.log("📷 Selected file:", file);
+
       if (!file) {
         toast.error("Please select an image.");
         return;
@@ -55,26 +58,27 @@ const AddProduct = ({ setIsProductModal }) => {
 
       setBtnDisabled(true);
 
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "shopzone");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "shopzone");
 
+      console.log("🚀 Uploading to Cloudinary with preset:", formData.get("upload_preset"));
+
+      try {
         const uploadRes = await axios.post(
-          "https://api.cloudinary.com/v1_1/dp5whpvw0/image/upload",
+          "https://api.cloudinary.com/v1_1/djbozc4ph/image/upload", // ✅ Correct cloud name
           formData
         );
-        const { url } = uploadRes.data;
+
+        console.log("✅ Cloudinary upload success:", uploadRes.data);
+        const imageUrl = uploadRes.data.secure_url;
 
         const productData = {
-          img: url,
+          img: imageUrl,
           title: values.title,
           desc: values.desc,
           category: values.category.toLowerCase(),
-          prices:
-            values.category.toLowerCase() === "pizza"
-              ? [values.smallPrice, values.mediumPrice, values.largePrice]
-              : [values.smallPrice],
+          prices: [values.smallPrice],
         };
 
         const res = await axios.post(
@@ -86,9 +90,10 @@ const AddProduct = ({ setIsProductModal }) => {
           toast.success("Product created successfully!");
           setIsProductModal(false);
         }
-      } catch (error) {
-        console.error("Error creating product:", error);
-        toast.error("Failed to create product.");
+      } catch (err) {
+        const msg = err?.response?.data?.error?.message || err.message;
+        console.error("❌ Cloudinary Upload Failed:", msg);
+        toast.error(`Upload failed: ${msg}`);
       }
 
       setBtnDisabled(false);
@@ -99,7 +104,7 @@ const AddProduct = ({ setIsProductModal }) => {
     <div className="fixed top-0 left-0 w-screen h-screen z-50 after:content-[''] after:w-screen after:h-screen after:bg-white after:absolute after:top-0 after:left-0 after:opacity-60 grid place-content-center">
       <OutsideClickHandler
         onOutsideClick={() => {
-          if (confirm("Are you sure you want to exit?")) {
+          if (window.confirm("Are you sure you want to exit?")) {
             setIsProductModal(false);
           }
         }}
@@ -118,9 +123,15 @@ const AddProduct = ({ setIsProductModal }) => {
                   type="file"
                   className="hidden"
                   name="image"
+                  ref={fileInputRef}
                   onChange={handleOnchange}
+                  accept="image/*"
                 />
-                <button type="button" className="btn-primary !rounded-none !bg-blue-600 pointer-events-none">
+                <button
+                  type="button"
+                  className="btn-primary !rounded-none !bg-blue-600"
+                  onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                >
                   Choose an Image
                 </button>
                 {imageSrc && (
@@ -145,7 +156,9 @@ const AddProduct = ({ setIsProductModal }) => {
                   type="text"
                   name="title"
                   placeholder="Write a Title"
-                  className={`border p-3 rounded-md ${formik.errors.title && formik.touched.title ? "border-red-500" : "border-gray-400"}`}
+                  className={`border p-3 rounded-md ${
+                    formik.errors.title && formik.touched.title ? "border-red-500" : "border-gray-400"
+                  }`}
                   value={formik.values.title}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -161,7 +174,9 @@ const AddProduct = ({ setIsProductModal }) => {
                 <textarea
                   name="desc"
                   placeholder="Write a Description"
-                  className={`border p-3 h-16 rounded-md ${formik.errors.desc && formik.touched.desc ? "border-red-500" : "border-gray-400"}`}
+                  className={`border p-3 h-16 rounded-md ${
+                    formik.errors.desc && formik.touched.desc ? "border-red-500" : "border-gray-400"
+                  }`}
                   value={formik.values.desc}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -188,44 +203,31 @@ const AddProduct = ({ setIsProductModal }) => {
                     </option>
                   ))}
                 </select>
+                {formik.errors.category && formik.touched.category && (
+                  <span className="text-xs mt-1 text-danger">{formik.errors.category}</span>
+                )}
               </div>
 
-              {/* Prices */}
+              {/* Price */}
               <div className="flex flex-col text-sm mt-4">
-                <span className="font-semibold mb-1">Prices</span>
-                {formik.values.category === "pizza" ? (
-                  <div className="flex justify-between gap-4 md:flex-row flex-col items-center">
-                    {["smallPrice", "mediumPrice", "largePrice"].map((priceName, idx) => (
-                      <input
-                        key={priceName}
-                        type="number"
-                        name={priceName}
-                        placeholder={priceName.replace("Price", "")}
-                        className={`border p-1 text-sm outline-none md:w-28 ${
-                          formik.errors[priceName] && formik.touched[priceName]
-                            ? "border-red-500"
-                            : "border-gray-400"
-                        }`}
-                        value={formik.values[priceName]}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <input
-                    type="number"
-                    name="smallPrice"
-                    placeholder="Price"
-                    className={`border p-1 text-sm outline-none md:w-28 ${
-                      formik.errors.smallPrice && formik.touched.smallPrice
-                        ? "border-red-500"
-                        : "border-gray-400"
-                    }`}
-                    value={formik.values.smallPrice}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
+                <span className="font-semibold mb-1">Price</span>
+                <input
+                  type="number"
+                  name="smallPrice"
+                  placeholder="Price"
+                  className={`border p-1 text-sm outline-none md:w-28 ${
+                    formik.errors.smallPrice && formik.touched.smallPrice
+                      ? "border-red-500"
+                      : "border-gray-400"
+                  }`}
+                  value={formik.values.smallPrice}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                {formik.errors.smallPrice && formik.touched.smallPrice && (
+                  <span className="text-xs mt-1 text-danger">
+                    {formik.errors.smallPrice}
+                  </span>
                 )}
               </div>
             </div>
@@ -245,7 +247,7 @@ const AddProduct = ({ setIsProductModal }) => {
               className="absolute top-4 right-4"
               type="button"
               onClick={() => {
-                if (confirm("Are you sure you want to exit?")) {
+                if (window.confirm("Are you sure you want to exit?")) {
                   setIsProductModal(false);
                 }
               }}
