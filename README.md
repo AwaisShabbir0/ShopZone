@@ -118,9 +118,9 @@ npm run dev
 
 ```
 
-Visit http://localhost:3000
+http://localhost:3000
 
-🤝 Contributing
+## 🤝 Contributing
 
 We welcome pull requests, discussions, and suggestions. Please fork the repo, submit your changes, and open a PR.
 
@@ -130,6 +130,7 @@ We welcome pull requests, discussions, and suggestions. Please fork the repo, su
 
 📧 Email: awaiskamboh0810@gmail.com
 
-⭐ Like This Project?
+    
+## ⭐ Like This Project?
 
 Don’t forget to star ⭐ the repo if you found it helpful!
