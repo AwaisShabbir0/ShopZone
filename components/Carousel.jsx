@@ -23,15 +23,15 @@ const Carousel = () => {
   };
 
   return (
-    <div className="h-screen w-full container mx-auto -mt-[88px]">
+    <div className="h-screen w-full container mx-auto -mt-[88px] mb-10">
       <div className="absolute top-0 left-0 w-full h-full">
-        <div className="relative h-full w-full">
+        <div className="relative w-full h-[calc(100vh-4rem)] mt-[4.0rem]">
           <Image
             src="/images/hero-bg.jpg"
             alt=""
             layout="fill"
             priority
-            objectFit="cover"
+            objectFit="object-cover"
           />
         </div>
       </div>

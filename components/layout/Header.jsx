@@ -3,24 +3,21 @@ import { FaUserAlt, FaShoppingCart, FaSearch } from "react-icons/fa";
 import Logo from "../ui/Logo";
 import Search from "../ui/Search";
 import { GiHamburgerMenu, GiCancel } from "react-icons/gi";
-import { useRouter } from "next/router";  //for navigation / move to next page
+import { useRouter } from "next/router";
 import Link from "next/link";
-import { useSelector } from "react-redux";  //It provides a way to read the state from the Redux store in a component.
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const [isSearchModal, setIsSearchModal] = useState(false);
   const [isMenuModal, setIsMenuModal] = useState(false);
   const cart = useSelector((state) => state.cart);
-
   const router = useRouter();
 
   return (
     <div
-      className={`h-[5.5rem] z-50 relative w-full ${
-        router.asPath === "/" ? "bg-transparent fixed" : "bg-red-400"
-      }`}
+      className={`h-[4rem] z-50 w-full fixed top-0 left-0 shadow-md backdrop-blur-md bg-gradient-to-r from-pink-400 to-yellow-300`}
     >
-      <div className="container mx-auto flex justify-between items-center h-full">
+      <div className="container mx-auto flex justify-between items-center h-full px-2">
         <Logo />
         <nav
           className={`sm:static absolute top-0 left-0 sm:w-auto sm:h-auto w-full h-screen sm:text-black text-black sm:bg-transparent bg-white sm:flex hidden z-50 ${
@@ -28,45 +25,29 @@ const Header = () => {
           }`}
         >
           <ul className="flex gap-x-2 sm:flex-row flex-col items-center">
-            <li
-              className={`px-[5px] py-[10px] uppercase hover:text-white cursor-pointer ${
-                router.asPath === "/" && "text-primary"
-              }}`}
-              onClick={() => setIsMenuModal(false)}
-            >
-              <Link href="/"><b>Home</b></Link>
-            </li>
-            <li
-              className={`px-[5px] py-[10px] uppercase hover:text-white cursor-pointer ${
-                router.asPath === "/menu" && "text-primary"
-              }`}
-              onClick={() => setIsMenuModal(false)}
-            >
-              <Link href="/menu"><b>Menu</b></Link>
-            </li>
-            <li
-              className={`px-[5px] py-[10px] uppercase hover:text-white cursor-pointer ${
-                router.asPath === "/about" && "text-primary"
-              }`}
-              onClick={() => setIsMenuModal(false)}
-            >
-              <Link href="/about"><b>About</b></Link>
-            </li>
-            <li
-              className={`px-[5px] py-[10px] uppercase hover:text-white cursor-pointer ${
-                router.asPath === "/reservation" && "text-primary"
-              }`}
-              onClick={() => setIsMenuModal(false)}
-            >
-              <Link href="/reservation"><b>Contact</b></Link>
-            </li>
+            {[
+              { name: "Home", path: "/" },
+              { name: "Menu", path: "/menu" },
+              { name: "About", path: "/about" },
+              { name: "Contact", path: "/reservation" },
+            ].map((item) => (
+              <li
+                key={item.name}
+                className={`px-3 py-1 mx-1 text-sm rounded-full font-semibold transition-all duration-300 ${
+                  router.asPath === item.path ? "bg-white text-yellow-500" : "bg-yellow-400 text-white hover:opacity-90"
+                }`}
+                onClick={() => setIsMenuModal(false)}
+              >
+                <Link href={item.path}>{item.name}</Link>
+              </li>
+            ))}
           </ul>
           {isMenuModal && (
             <button
-              className="absolute  top-4 right-4 z-50"
+              className="absolute top-4 right-4 z-50"
               onClick={() => setIsMenuModal(false)}
             >
-              <GiCancel size={25} className=" transition-all" />
+              <GiCancel size={25} className="transition-all" />
             </button>
           )}
         </nav>
@@ -77,14 +58,14 @@ const Header = () => {
                 <i
                   className={`fa-solid fa-right-to-bracket ${
                     router.asPath.includes("login") && "text-primary"
-                  } `}
+                  }`}
                 ></i>
               ) : (
                 <FaUserAlt
                   className={`hover:text-white transition-all cursor-pointer ${
-                    (router.asPath.includes("auth") ||
-                      router.asPath.includes("profile")) &&
-                    "text-primary"
+                    router.asPath.includes("auth") || router.asPath.includes("profile")
+                      ? "text-primary"
+                      : ""
                   }`}
                 />
               )}
@@ -92,9 +73,7 @@ const Header = () => {
           </Link>
           <Link href="/cart">
             <span className="relative">
-              <FaShoppingCart
-                className={`hover:text-white transition-all cursor-pointer`}
-              />
+              <FaShoppingCart className="hover:text-white transition-all cursor-pointer" />
               <span className="w-4 h-4 text-xs grid place-content-center rounded-full bg-primary absolute -top-2 -right-3 text-black font-bold">
                 {cart.products.length === 0 ? "0" : cart.products.length}
               </span>
