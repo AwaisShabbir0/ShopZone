@@ -62,7 +62,7 @@ const Order = ({ order }) => {
             <Image
               src="/images/bake.png"
               alt=""
-              width={40}
+              width={50}
               height={40}
               objectFit="contain"
             />
